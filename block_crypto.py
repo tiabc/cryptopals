@@ -2,7 +2,7 @@ from Crypto.Cipher import AES
 from common import *
 
 
-def aes_cbc_decrypt(ct, iv, key):
+def aes_cbc_decrypt(iv, ct, key):
     key_len = len(key)
     ct_blocks = [ct[i:i+key_len] for i in range(0, len(ct), key_len)]
     cipher = AES.new(key, AES.MODE_ECB)
@@ -17,7 +17,7 @@ def aes_cbc_decrypt(ct, iv, key):
     return result
 
 
-def decode_aes_ecb(ct, key):
+def aes_ecb_decrypt(ct, key):
     key_len = len(key)
     ct_blocks = [ct[i:i+key_len] for i in range(0, len(ct), key_len)]
     res_pt = bytearray()
