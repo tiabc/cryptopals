@@ -4,7 +4,7 @@ from common import *
 
 def aes_cbc_encrypt(iv, pt, key):
     key_len = len(key)
-    pt_blocks = [pt[i:i+key_len] for i in range(0, len(pt), key_len)]
+    pt_blocks = [pt[i:i + key_len] for i in range(0, len(pt), key_len)]
     pt_blocks[-1] = add_pkcs7_padding(pt_blocks[-1], key_len)
 
     cipher = AES.new(key, AES.MODE_ECB)
@@ -20,7 +20,7 @@ def aes_cbc_encrypt(iv, pt, key):
 
 def aes_cbc_decrypt(iv, ct, key):
     key_len = len(key)
-    ct_blocks = [ct[i:i+key_len] for i in range(0, len(ct), key_len)]
+    ct_blocks = [ct[i:i + key_len] for i in range(0, len(ct), key_len)]
     cipher = AES.new(key, AES.MODE_ECB)
 
     result = bytearray()
@@ -35,7 +35,7 @@ def aes_cbc_decrypt(iv, ct, key):
 
 def aes_ecb_encrypt(pt, key):
     key_len = len(key)
-    pt_blocks = [pt[i:i+key_len] for i in range(0, len(pt), key_len)]
+    pt_blocks = [pt[i:i + key_len] for i in range(0, len(pt), key_len)]
     pt_blocks[-1] = add_pkcs7_padding(pt_blocks[-1], key_len)
 
     res_pt = bytearray()
@@ -47,7 +47,7 @@ def aes_ecb_encrypt(pt, key):
 
 def aes_ecb_decrypt(ct, key):
     key_len = len(key)
-    ct_blocks = [ct[i:i+key_len] for i in range(0, len(ct), key_len)]
+    ct_blocks = [ct[i:i + key_len] for i in range(0, len(ct), key_len)]
     res_pt = bytearray()
     cipher = AES.new(key, AES.MODE_ECB)
     for b in ct_blocks:
@@ -69,3 +69,13 @@ def add_pkcs7_padding(text, desired_length, padding=b"\04"):
     while len(res) < desired_length:
         res += padding
     return res
+
+
+def detect_block_size(encrypt_func):
+    feed = bytearray()
+    prev_len = len(encrypt_func(feed))
+    while True:
+        feed += b"A"
+        length = len(encrypt_func(feed))
+        if length != prev_len:
+            return length - prev_len, len(feed) - 1
