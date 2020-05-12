@@ -12,3 +12,9 @@ def count_readable_letters(text):
             n += 1
     return n
 
+
+def xor_repeating_key(text, key):
+    ct = bytearray()
+    for i in range(len(text)):
+        ct.append(text[i] ^ key[i % len(key)])
+    return ct
