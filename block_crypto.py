@@ -18,3 +18,11 @@ def is_potential_ecb(ct, key_len):
         if block in ct[block_start + key_len:]:
             return True
     return False
+
+
+def add_pkcs7_padding(text, desired_length, padding=b"\04"):
+    res = bytearray()
+    res += text
+    while len(res) < desired_length:
+        res += padding
+    return res
