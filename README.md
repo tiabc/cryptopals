@@ -7,4 +7,4 @@ I wrote some code in it some time ago but nothing serious. This repository
 can't be used to evaluate my programming level in terms of Python knowledge.
 
 Note that the code isn't ideal, it misses many checks
-and not properly structures. It was written this way deliberately.
+and not properly structured. It was written this way deliberately for simplicity.
