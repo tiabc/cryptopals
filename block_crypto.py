@@ -33,6 +33,18 @@ def aes_cbc_decrypt(iv, ct, key):
     return result
 
 
+def aes_ecb_encrypt(pt, key):
+    key_len = len(key)
+    pt_blocks = [pt[i:i+key_len] for i in range(0, len(pt), key_len)]
+    pt_blocks[-1] = add_pkcs7_padding(pt_blocks[-1], key_len)
+
+    res_pt = bytearray()
+    cipher = AES.new(key, AES.MODE_ECB)
+    for b in pt_blocks:
+        res_pt += cipher.encrypt(b)
+    return res_pt
+
+
 def aes_ecb_decrypt(ct, key):
     key_len = len(key)
     ct_blocks = [ct[i:i+key_len] for i in range(0, len(ct), key_len)]
