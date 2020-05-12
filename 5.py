@@ -1,5 +1,5 @@
 import binascii
-from lib import *
+from common import *
 
 plaintexts = [
     b"Burning 'em, if you ain't quick and nimble",

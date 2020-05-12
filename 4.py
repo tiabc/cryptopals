@@ -1,5 +1,4 @@
-import binascii
-from lib import *
+from common import *
 
 
 result_pt = b''

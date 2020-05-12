@@ -1,8 +1,4 @@
-def xor_single_key(text, key):
-    res = bytearray()
-    for char in text:
-        res.append(char ^ key)
-    return res
+import base64
 
 
 def count_readable_letters(text):
@@ -18,3 +14,14 @@ def xor_repeating_key(text, key):
     for i in range(len(text)):
         ct.append(text[i] ^ key[i % len(key)])
     return ct
+
+
+def ct_from_base64_file(filename):
+    f = open(filename, 'r')
+    ct_base64 = ""
+    for line in f:
+        ct_base64 += line.strip()
+    f.close()
+
+    return base64.b64decode(ct_base64)
+
