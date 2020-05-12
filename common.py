@@ -1,4 +1,5 @@
 import base64
+import random
 
 
 def count_readable_letters(text):
@@ -24,4 +25,3 @@ def ct_from_base64_file(filename):
     f.close()
 
     return base64.b64decode(ct_base64)
-
