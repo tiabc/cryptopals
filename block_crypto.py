@@ -1,5 +1,20 @@
 from Crypto.Cipher import AES
-import binascii
+from common import *
+
+
+def aes_cbc_decrypt(ct, iv, key):
+    key_len = len(key)
+    ct_blocks = [ct[i:i+key_len] for i in range(0, len(ct), key_len)]
+    cipher = AES.new(key, AES.MODE_ECB)
+
+    result = bytearray()
+    previous_ct = iv
+    for block in ct_blocks:
+        decrypted = cipher.decrypt(block)
+        pt = xor_repeating_key(decrypted, previous_ct)
+        result += pt
+        previous_ct = block
+    return result
 
 
 def decode_aes_ecb(ct, key):
