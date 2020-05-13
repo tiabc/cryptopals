@@ -79,3 +79,44 @@ def detect_block_size(encrypt_func):
         length = len(encrypt_func(feed))
         if length != prev_len:
             return length - prev_len, len(feed) - 1
+
+
+def detect_last_byte(encrypt_func, prefix, block_size, block_num, char_num):
+    ctmap = {}
+    for char in range(0, 256):
+        ct = encrypt_func(prefix + bytes([char]))
+        ct_block = bytes(ct[0:block_size])
+        ctmap[ct_block] = bytes([char])
+    ct = encrypt_func(prefix[0:len(prefix) - char_num])
+    return ctmap[bytes(ct[block_num * block_size:(block_num + 1) * block_size])]
+
+
+def break_aes_ecb(encrypt_func):
+    block_size, chars_to_fill_block = detect_block_size(encrypt_func)
+    print("(block size: %d)" % block_size)
+
+    is_ecb = is_potential_ecb(encrypt_func(b"A" * block_size * 3), block_size)
+    if not is_ecb:
+        raise Exception("the encryption mode doesn't seem ECB")
+
+    ct_len = len(encrypt_func(b""))
+
+    plaintext = b""
+    block_num = 0
+    prefix = b"A" * (block_size - 1)
+    while block_num < ct_len / block_size:
+        for i in range(0, block_size):
+            # print(prefix, len(prefix))
+            first_byte = detect_last_byte(
+                encrypt_func,
+                prefix,
+                block_size,
+                block_num,
+                i,
+            )
+            prefix = prefix[1:] + first_byte
+            plaintext += first_byte
+        prefix = plaintext[-block_size + 1:]
+        block_num += 1
+
+    return plaintext
