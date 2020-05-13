@@ -52,7 +52,7 @@ def aes_ecb_decrypt(ct, key):
     cipher = AES.new(key, AES.MODE_ECB)
     for b in ct_blocks:
         res_pt += cipher.decrypt(b)
-    return res_pt
+    return res_pt.rstrip(b"\04")
 
 
 def is_potential_ecb(ct, key_len):
@@ -78,7 +78,7 @@ def detect_block_size(encrypt_func):
         feed += b"A"
         length = len(encrypt_func(feed))
         if length != prev_len:
-            return length - prev_len, len(feed) - 1
+            return length - prev_len, (len(feed) - 1) % (length - prev_len)
 
 
 def detect_last_byte(encrypt_func, prefix, block_size, block_num, char_num):
@@ -88,10 +88,15 @@ def detect_last_byte(encrypt_func, prefix, block_size, block_num, char_num):
         ct_block = bytes(ct[0:block_size])
         ctmap[ct_block] = bytes([char])
     ct = encrypt_func(prefix[0:len(prefix) - char_num])
-    return ctmap[bytes(ct[block_num * block_size:(block_num + 1) * block_size])]
+    k = bytes(ct[block_num * block_size:(block_num + 1) * block_size])
+    if k not in ctmap:
+        # TODO: List escaped chars.
+        return b"_"
+    return ctmap[k]
 
 
-def break_aes_ecb(encrypt_func):
+
+def break_aes_ecb(constant_prefix_len, encrypt_func):
     block_size, chars_to_fill_block = detect_block_size(encrypt_func)
     print("(block size: %d)" % block_size)
 
@@ -99,13 +104,13 @@ def break_aes_ecb(encrypt_func):
     if not is_ecb:
         raise Exception("the encryption mode doesn't seem ECB")
 
-    ct_len = len(encrypt_func(b""))
+    # ct_len = len(encrypt_func(b""))
 
     plaintext = b""
     block_num = 0
-    prefix = b"A" * (block_size - 1)
-    while block_num < ct_len / block_size:
-        for i in range(0, block_size):
+    prefix = b"A" * (block_size - constant_prefix_len - 1)
+    while block_num < 1:
+        for i in range(0, block_size - constant_prefix_len):
             # print(prefix, len(prefix))
             first_byte = detect_last_byte(
                 encrypt_func,

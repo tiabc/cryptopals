@@ -11,4 +11,4 @@ def encrypt(supplied_pt):
     return ct
 
 
-print(break_aes_ecb(encrypt))
+print(break_aes_ecb(0, encrypt))
